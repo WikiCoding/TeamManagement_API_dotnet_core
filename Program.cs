@@ -27,9 +27,11 @@ builder.Services.AddScoped<IEmployeeRepository, EmployeeRepositoryPostgres>();
 builder.Services.AddScoped<IProjectRepository, ProjectRepositoryPostgres>();
 builder.Services.AddScoped<IAddProject, AddProjectService>();
 builder.Services.AddScoped<IGetAllProjects, GetAllProjectsService>();
-builder.Services.AddScoped<IGetProjectFromEmployee, GetProjectFromEmployeeService>();
+builder.Services.AddScoped<IGetProjectsFromEmployee, GetProjectsFromEmployeeService>();
+builder.Services.AddScoped<IDeleteProject, DeleteProjectService>();
 builder.Services.AddScoped<IAddEmployee, AddEmployeeService>();
 builder.Services.AddScoped<IGetAllEmployees, GetAllEmployeesService>();
+builder.Services.AddScoped<IDeleteEmployee, DeleteEmployeeService>();
 builder.Services.AddDbContext<TeamManagementDbContext>(options => 
     options.UseNpgsql(builder.Configuration.GetConnectionString("TeamManagementDb")));
 

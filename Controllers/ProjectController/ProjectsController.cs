@@ -3,7 +3,6 @@ using TeamManagement.Domain.UseCases;
 using TeamManagement.DTO;
 using TeamManagement.ValueObjects;
 using TeamManagement.Domain.Project;
-using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace TeamManagement.Controllers.ProjectController
 {
@@ -13,13 +12,15 @@ namespace TeamManagement.Controllers.ProjectController
     {
         private readonly IAddProject _addProjectService;
         private readonly IGetAllProjects _getAllProjects;
-        private readonly IGetProjectFromEmployee _getProjectFromEmployee;
+        private readonly IGetProjectsFromEmployee _getProjectFromEmployee;
+        private readonly IDeleteProject _deleteProject;
 
-        public ProjectsController(IAddProject addProjectService, IGetAllProjects getAllProjects, IGetProjectFromEmployee getProjectFromEmployee)
+        public ProjectsController(IAddProject addProjectService, IGetAllProjects getAllProjects, IGetProjectsFromEmployee getProjectFromEmployee, IDeleteProject deleteProject)
         {
             _addProjectService = addProjectService;
             _getAllProjects = getAllProjects;
             _getProjectFromEmployee = getProjectFromEmployee;
+            _deleteProject = deleteProject;
         }
 
         [HttpGet]
@@ -33,21 +34,21 @@ namespace TeamManagement.Controllers.ProjectController
         }
 
         [HttpGet("employee/{employee-id}")]
-        public async Task<IActionResult> GetProjectFromEmployee([FromRoute(Name = "employee-id")] int employeeId)
+        public async Task<ActionResult<List<ProjectsResponse>>> GetProjectFromEmployee([FromRoute(Name = "employee-id")] int employeeId)
         {
-            Project project;
+            List<Project> projects;
             try
             {
-                project = await _getProjectFromEmployee.GetProjectFromEmployee(employeeId);
+                projects = await _getProjectFromEmployee.GetProjectsFromEmployee(employeeId);
+
+                List<ProjectsResponse> response = projects.ConvertAll<ProjectsResponse>(proj => MapProjectToResponse(proj)).ToList();
+
+                return Ok(response);
             }
             catch (Exception ex)
             {
                 return BadRequest(ex.Message);
             }
-
-            ProjectsResponse projectsResponse = new(project.projectId.id, project.projectDescription.Description, project.employeeId.id);
-
-            return Ok(projectsResponse);
         }
 
         [HttpPost]
@@ -78,6 +79,26 @@ namespace TeamManagement.Controllers.ProjectController
             {
                 return NotFound(ex.Message);
             }
+        }
+
+        [HttpDelete("{project-id}")]
+        public async Task<IActionResult> DeleteProject([FromRoute(Name = "project-id")] int projectId)
+        {
+            try
+            {
+                Project project = await _deleteProject.DeleteProject(projectId);
+
+                return Ok(project);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        private static ProjectsResponse MapProjectToResponse(Project project)
+        {
+            return new ProjectsResponse(project.projectId.id, project.projectDescription.Description, project.employeeId.id);
         }
     }
 }

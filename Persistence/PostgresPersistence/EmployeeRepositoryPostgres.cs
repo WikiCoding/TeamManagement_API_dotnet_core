@@ -20,6 +20,7 @@ namespace TeamManagement.Persistence.PostgresPersistence
         public async Task<EmployeeDataModel> CreateEmployee(Employee employee)
         {
             EmployeeDataModel employeeDataModel = new(employee);
+            employeeDataModel.EmployeeId = 0;
             using IDbContextTransaction transaction = await _dbContext.Database.BeginTransactionAsync();
 
             try
@@ -48,6 +49,26 @@ namespace TeamManagement.Persistence.PostgresPersistence
         public async Task<EmployeeDataModel?> GetEmployeeById(int employeeId)
         {
             return await _dbContext.Employees.Where(empl => empl.EmployeeId == employeeId).FirstOrDefaultAsync(); 
+        }
+        public async Task<EmployeeDataModel> DeleteEmployee(EmployeeDataModel employeeDataModel)
+        {
+            using var transaction = await _dbContext.Database.BeginTransactionAsync();
+
+            try
+            {
+                _dbContext.Employees.Remove(employeeDataModel);
+
+                await _dbContext.SaveChangesAsync();
+
+                await transaction.CommitAsync();
+
+                return employeeDataModel;
+            }
+            catch (Exception ex)
+            {
+                await transaction.RollbackAsync();
+                throw new Exception($"There was a problem deleting the employee: {ex}");
+            }
         }
     }
 }

@@ -31,5 +31,12 @@ namespace TeamManagement.Persistence.MemoryPersistence
         {
             return _employeeDb[employeeId] ?? null;
         }
+
+        public async Task<EmployeeDataModel> DeleteEmployee(EmployeeDataModel employeeDataModel)
+        {
+            _employeeDb.Remove(employeeDataModel.EmployeeId);
+            
+            return employeeDataModel;
+        }
     }
 }

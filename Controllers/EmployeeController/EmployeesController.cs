@@ -12,11 +12,13 @@ namespace TeamManagement.Controllers.EmployeeController
     {
         private readonly IGetAllEmployees _getAllEmployeesService;
         private readonly IAddEmployee _addEmployeeService;
+        private readonly IDeleteEmployee _deleteEmployeeService;
 
-        public EmployeesController(IGetAllEmployees getAllEmployees, IAddEmployee addEmployee)
+        public EmployeesController(IGetAllEmployees getAllEmployees, IAddEmployee addEmployee, IDeleteEmployee deleteEmployeeService)
         {
             _getAllEmployeesService = getAllEmployees;
             _addEmployeeService = addEmployee;
+            _deleteEmployeeService = deleteEmployeeService;
         }
 
         [HttpGet]
@@ -51,6 +53,23 @@ namespace TeamManagement.Controllers.EmployeeController
             EmployeesResponse employeesResponse = MapEmployeeToResponse(employee);
 
             return CreatedAtAction(nameof(AddEmployee), employeesResponse);
+        }
+
+        [HttpDelete("{employee-id}")]
+        public async Task<IActionResult> DeleteEmployee([FromRoute(Name = "employee-id")] int employeeId)
+        {
+            try
+            {
+                Employee employee = await _deleteEmployeeService.DeleteEmployee(employeeId);
+
+                EmployeesResponse employeesResponse = MapEmployeeToResponse(employee);
+
+                return Ok(employee);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         private static EmployeesResponse MapEmployeeToResponse(Employee employee)

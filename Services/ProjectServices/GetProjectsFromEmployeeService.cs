@@ -6,27 +6,27 @@ using TeamManagement.Persistence.DataModels;
 
 namespace TeamManagement.Services.ProjectServices
 {
-    public class GetProjectFromEmployeeService : IGetProjectFromEmployee
+    public class GetProjectsFromEmployeeService : IGetProjectsFromEmployee
     {
         private readonly IProjectFactory _projectFactory;
         private readonly IProjectRepository _projectRepository;
 
-        public GetProjectFromEmployeeService(IProjectFactory projectFactory, IProjectRepository projectRepository)
+        public GetProjectsFromEmployeeService(IProjectFactory projectFactory, IProjectRepository projectRepository)
         {
             _projectFactory = projectFactory;
             _projectRepository = projectRepository;
         }
 
-        public async Task<Project> GetProjectFromEmployee(int employeeId)
+        public async Task<List<Project>> GetProjectsFromEmployee(int employeeId)
         {
-            ProjectDataModel? projectDataModel = await _projectRepository.GetProjectFromEmployee(employeeId);
+            List<ProjectDataModel> projectDataModels = await _projectRepository.GetProjectsFromEmployee(employeeId);
 
-            if (projectDataModel == null)
+            if (projectDataModels == null)
             {
                 throw new Exception("No projects with this employee id");
             }
 
-            Project project = new ProjectsMapper(_projectFactory).DataModelToDomain(projectDataModel);
+            List<Project> project = new ProjectsMapper(_projectFactory).DataModelsToListDomain(projectDataModels);
 
             return project;
         }

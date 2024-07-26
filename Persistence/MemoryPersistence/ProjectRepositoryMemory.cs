@@ -24,12 +24,24 @@ namespace TeamManagement.Persistence.MemoryPersistence
 
         public async Task<List<ProjectDataModel>> GetAllProjects()
         {
-            return _projectDb.Values.ToList();
+            return [.. _projectDb.Values];
         }
 
-        public async Task<ProjectDataModel?> GetProjectFromEmployee(int employeeId)
+        public async Task<List<ProjectDataModel>> GetProjectsFromEmployee(int employeeId)
         {
-            return _projectDb[employeeId] ?? null;
+            return _projectDb.Where(item => item.Value.EmployeeId == employeeId).Select(proj => proj.Value).ToList();
+        }
+
+        public async Task<ProjectDataModel?> GetProjectById(int projectId)
+        {
+            return _projectDb[projectId];
+        }
+
+        public async Task<ProjectDataModel> DeleteProject(ProjectDataModel projectDataModel)
+        {
+            _projectDb.Remove(projectDataModel.ProjectId);
+
+            return projectDataModel;
         }
     }
 }

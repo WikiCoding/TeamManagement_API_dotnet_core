@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
 using TeamManagement.Domain.Project;
 using TeamManagement.Domain.Repositories;
 using TeamManagement.Infrastructure.Data;
@@ -18,6 +19,7 @@ namespace TeamManagement.Persistence.PostgresPersistence
         public async Task<ProjectDataModel> CreateProject(Project project)
         {
             ProjectDataModel projectDataModel = new(project);
+            projectDataModel.ProjectId = 0;
             using var transaction = _dbContext.Database.BeginTransaction();
 
             try
@@ -35,14 +37,38 @@ namespace TeamManagement.Persistence.PostgresPersistence
             }
         }
 
+        public async Task<ProjectDataModel> DeleteProject(ProjectDataModel projectDataModel)
+        {
+            using IDbContextTransaction transaction = _dbContext.Database.BeginTransaction();
+
+            try
+            {
+                _dbContext.Projects.Remove(projectDataModel);
+                await _dbContext.SaveChangesAsync();
+                transaction.Commit();
+
+                return projectDataModel;
+            }
+            catch (Exception ex)
+            {
+                transaction.Rollback();
+                throw new Exception($"Problem deleting project: {ex}");
+            }
+        }
+
         public async Task<List<ProjectDataModel>> GetAllProjects()
         {
             return await _dbContext.Projects.ToListAsync();
         }
 
-        public async Task<ProjectDataModel?> GetProjectFromEmployee(int employeeId)
+        public async Task<ProjectDataModel?> GetProjectById(int projectId)
         {
-            return await _dbContext.Projects.Where(proj => proj.EmployeeId == employeeId).FirstOrDefaultAsync();
+            return await _dbContext.Projects.Where(proj => proj.ProjectId == projectId).FirstOrDefaultAsync();
+        }
+
+        public async Task<List<ProjectDataModel>> GetProjectsFromEmployee(int employeeId)
+        {
+            return await _dbContext.Projects.Where(proj => proj.EmployeeId == employeeId).ToListAsync();
         }
     }
 }
