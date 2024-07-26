@@ -1,8 +1,11 @@
+using Microsoft.EntityFrameworkCore;
 using TeamManagement.Domain.Employee;
 using TeamManagement.Domain.Project;
 using TeamManagement.Domain.Repositories;
 using TeamManagement.Domain.UseCases;
+using TeamManagement.Infrastructure.Data;
 using TeamManagement.Persistence.MemoryPersistence;
+using TeamManagement.Persistence.PostgresPersistence;
 using TeamManagement.Services.EmployeeServices;
 using TeamManagement.Services.ProjectServices;
 
@@ -18,13 +21,17 @@ builder.Services.AddSwaggerGen();
 // Dependency Injection
 builder.Services.AddScoped<IProjectFactory, ProjectFactoryImpl>();
 builder.Services.AddScoped<IEmployeeFactory, EmployeeFactoryImpl>();
-builder.Services.AddScoped<IProjectRepository, ProjectRepositoryMemory>();
-builder.Services.AddScoped<IEmployeeRepository, EmployeeRepositoryMemory>();
+//builder.Services.AddScoped<IProjectRepository, ProjectRepositoryMemory>();
+//builder.Services.AddScoped<IEmployeeRepository, EmployeeRepositoryMemory>();
+builder.Services.AddScoped<IEmployeeRepository, EmployeeRepositoryPostgres>();
+builder.Services.AddScoped<IProjectRepository, ProjectRepositoryPostgres>();
 builder.Services.AddScoped<IAddProject, AddProjectService>();
 builder.Services.AddScoped<IGetAllProjects, GetAllProjectsService>();
 builder.Services.AddScoped<IGetProjectFromEmployee, GetProjectFromEmployeeService>();
 builder.Services.AddScoped<IAddEmployee, AddEmployeeService>();
 builder.Services.AddScoped<IGetAllEmployees, GetAllEmployeesService>();
+builder.Services.AddDbContext<TeamManagementDbContext>(options => 
+    options.UseNpgsql(builder.Configuration.GetConnectionString("TeamManagementDb")));
 
 var app = builder.Build();
 

@@ -4,13 +4,25 @@ using TeamManagement.ValueObjects;
 
 namespace TeamManagement.Persistence.DataModels
 {
-    public class EmployeeDataModel(Employee employee)
+    public class EmployeeDataModel
     {
         [Key]
-        public int EmployeeId { get; set; } = employee.employeeId.id;
+        public int EmployeeId { get; set; }
         [Required]
-        public string EmployeeName { get; set; } = employee.employeeName.Name;
+        public string EmployeeName { get; set; }
         [Required]
-        public Role Role { get; set; } = employee.role;
+        public Role Role { get; set; }
+
+        public EmployeeDataModel()
+        {
+            
+        }
+
+        public EmployeeDataModel(Employee employee)
+        {
+            EmployeeId = employee.employeeId.id;
+            EmployeeName = employee.employeeName.Name;
+            Role = employee.role;
+        }
     }
 }
