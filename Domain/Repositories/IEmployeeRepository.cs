@@ -8,5 +8,6 @@ namespace TeamManagement.Domain.Repositories
         Task<List<EmployeeDataModel>> GetAllEmployees();
         Task<EmployeeDataModel?> GetEmployeeById(int employeeId);
         Task<EmployeeDataModel> DeleteEmployee(EmployeeDataModel employee);
+        Task<int> UpdateEmployee(Domain.Employee.Employee employee);
     }
 }

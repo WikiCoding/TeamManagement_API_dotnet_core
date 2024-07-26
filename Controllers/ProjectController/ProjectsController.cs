@@ -3,6 +3,8 @@ using TeamManagement.Domain.UseCases;
 using TeamManagement.DTO;
 using TeamManagement.ValueObjects;
 using TeamManagement.Domain.Project;
+using System.Data;
+using TeamManagement.Services.EmployeeServices;
 
 namespace TeamManagement.Controllers.ProjectController
 {
@@ -13,14 +15,17 @@ namespace TeamManagement.Controllers.ProjectController
         private readonly IAddProject _addProjectService;
         private readonly IGetAllProjects _getAllProjects;
         private readonly IGetProjectsFromEmployee _getProjectFromEmployee;
+        private readonly IUpdateProject _updateProject;
         private readonly IDeleteProject _deleteProject;
 
-        public ProjectsController(IAddProject addProjectService, IGetAllProjects getAllProjects, IGetProjectsFromEmployee getProjectFromEmployee, IDeleteProject deleteProject)
+        public ProjectsController(IAddProject addProjectService, IGetAllProjects getAllProjects, IGetProjectsFromEmployee getProjectFromEmployee, 
+            IDeleteProject deleteProject, IUpdateProject updateProject)
         {
             _addProjectService = addProjectService;
             _getAllProjects = getAllProjects;
             _getProjectFromEmployee = getProjectFromEmployee;
             _deleteProject = deleteProject;
+            _updateProject = updateProject;
         }
 
         [HttpGet]
@@ -78,6 +83,39 @@ namespace TeamManagement.Controllers.ProjectController
             catch (Exception ex)
             {
                 return NotFound(ex.Message);
+            }
+        }
+
+        [HttpPut("{project-id}")]
+        public async Task<IActionResult> UpdateProject([FromRoute(Name = "project-id")] int projectId, AddProjectRequest request)
+        {
+            ProjectId projectIdObj;
+            ProjectDescription projectDescription;
+            EmployeeId employeeId;
+            try
+            {
+                projectIdObj = new(projectId);
+                projectDescription = new(request.projectDescription);
+                employeeId = new(request.employeeId);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+
+            try
+            {
+                int rowsAffected = await _updateProject.UpdateProject(projectIdObj, projectDescription, employeeId);
+                if (rowsAffected == 0)
+                {
+                    return NotFound();
+                }
+
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                return Conflict(ex.Message);
             }
         }
 

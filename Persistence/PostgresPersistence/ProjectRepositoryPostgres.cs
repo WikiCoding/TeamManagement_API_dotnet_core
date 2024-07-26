@@ -70,5 +70,35 @@ namespace TeamManagement.Persistence.PostgresPersistence
         {
             return await _dbContext.Projects.Where(proj => proj.EmployeeId == employeeId).ToListAsync();
         }
+
+        public async Task<int> UpdateProject(Project project)
+        {
+            using var transaction = await _dbContext.Database.BeginTransactionAsync();
+
+            try
+            {
+                int rowsAffected = await _dbContext.Projects.Where(proj => proj.ProjectId == project.projectId.id)
+                .ExecuteUpdateAsync(updates =>
+                        updates.SetProperty(proj => proj.ProjectDescription, project.projectDescription.Description)
+                               .SetProperty(proj => proj.EmployeeId, project.employeeId.id)
+                               .SetProperty(proj => proj.Version, proj => proj.Version + 1)
+                );
+
+                if (rowsAffected == 0)
+                {
+                    await transaction.RollbackAsync();
+                    throw new Exception("Error updating...");
+                }
+
+                await transaction.CommitAsync();
+
+                return rowsAffected;
+            }
+            catch (DbUpdateConcurrencyException ex)
+            {
+                await transaction.RollbackAsync();
+                throw new Exception("Concurrency error occurred while updating the project.", ex);
+            }
+        }
     }
 }

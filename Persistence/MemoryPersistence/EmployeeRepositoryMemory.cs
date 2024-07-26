@@ -38,5 +38,12 @@ namespace TeamManagement.Persistence.MemoryPersistence
             
             return employeeDataModel;
         }
+
+        public async Task<int> UpdateEmployee(Employee employee)
+        {
+            EmployeeDataModel employeeDataModel = new(employee);
+            _employeeDb[employee.employeeId.id] = employeeDataModel;
+            return 1;
+        }
     }
 }

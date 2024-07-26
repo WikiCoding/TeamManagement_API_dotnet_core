@@ -13,6 +13,9 @@ namespace TeamManagement.Persistence.DataModels
         [Required]
         public Role Role { get; set; }
 
+        [ConcurrencyCheck]
+        public int Version { get; set; }
+
         public EmployeeDataModel()
         {
             

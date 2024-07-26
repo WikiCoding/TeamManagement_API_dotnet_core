@@ -1,4 +1,5 @@
-﻿using TeamManagement.Domain.Project;
+﻿using TeamManagement.Domain.Employee;
+using TeamManagement.Domain.Project;
 using TeamManagement.Domain.Repositories;
 using TeamManagement.Persistence.DataModels;
 
@@ -42,6 +43,13 @@ namespace TeamManagement.Persistence.MemoryPersistence
             _projectDb.Remove(projectDataModel.ProjectId);
 
             return projectDataModel;
+        }
+
+        public async Task<int> UpdateProject(Project project)
+        {
+            ProjectDataModel projectDataModel = new(project);
+            _projectDb[project.projectId.id] = projectDataModel;
+            return 1;
         }
     }
 }

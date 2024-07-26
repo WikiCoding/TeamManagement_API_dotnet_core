@@ -12,12 +12,14 @@ namespace TeamManagement.Controllers.EmployeeController
     {
         private readonly IGetAllEmployees _getAllEmployeesService;
         private readonly IAddEmployee _addEmployeeService;
+        private readonly IUpdateEmployee _updateEmployeeService;
         private readonly IDeleteEmployee _deleteEmployeeService;
 
-        public EmployeesController(IGetAllEmployees getAllEmployees, IAddEmployee addEmployee, IDeleteEmployee deleteEmployeeService)
+        public EmployeesController(IGetAllEmployees getAllEmployees, IAddEmployee addEmployee, IUpdateEmployee updateEmployee, IDeleteEmployee deleteEmployeeService)
         {
             _getAllEmployeesService = getAllEmployees;
             _addEmployeeService = addEmployee;
+            _updateEmployeeService = updateEmployee;
             _deleteEmployeeService = deleteEmployeeService;
         }
 
@@ -53,6 +55,39 @@ namespace TeamManagement.Controllers.EmployeeController
             EmployeesResponse employeesResponse = MapEmployeeToResponse(employee);
 
             return CreatedAtAction(nameof(AddEmployee), employeesResponse);
+        }
+
+        [HttpPut("{employee-id}")]
+        public async Task<IActionResult> UpdateEmployee([FromRoute(Name = "employee-id")] int employeeId, AddEmployeeRequest request)
+        {
+            EmployeeId employeeIdObj;
+            EmployeeName employeeName;
+            Role role;
+            try
+            {
+                employeeIdObj = new(employeeId);
+                employeeName = new(request.EmployeeName);
+                role = (Role)Enum.Parse(typeof(Role), request.Role.Trim().ToUpperInvariant());
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+
+            try
+            {
+                int rowsAffected = await _updateEmployeeService.UpdateEmployee(employeeIdObj, employeeName, role);
+                if (rowsAffected == 0)
+                {
+                    return NotFound();
+                }
+
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                return Conflict(ex.Message);
+            }
         }
 
         [HttpDelete("{employee-id}")]

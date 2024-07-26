@@ -9,5 +9,6 @@ namespace TeamManagement.Domain.Repositories
         Task<List<ProjectDataModel>> GetProjectsFromEmployee(int employeeId);
         Task<ProjectDataModel?> GetProjectById(int projectId);
         Task<ProjectDataModel> DeleteProject(ProjectDataModel project);
+        Task<int> UpdateProject(Domain.Project.Project project);
     }
 }
