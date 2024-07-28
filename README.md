@@ -20,3 +20,9 @@ ASP.NET Core Learning project in monolithic architecture using:
 Add-Migration <migration_name>
 Update-Database
 ```
+
+# Create table scripts without using migrations:
+```
+CREATE TABLE "Employees"("EmployeeId" SERIAL PRIMARY KEY, "EmployeeName" VARCHAR(255) NOT NULL, "Role" INTEGER, "Version" INTEGER DEFAULT 0);
+CREATE TABLE "Projects"("ProjectId" SERIAL PRIMARY KEY, "ProjectDescription" VARCHAR(255) NOT NULL, "EmployeeId" INTEGER, "Version" INTEGER DEFAULT 0);
+```

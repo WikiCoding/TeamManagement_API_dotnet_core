@@ -9,7 +9,7 @@ using TeamManagement.Services.EmployeeServices;
 namespace TeamManagement.Controllers.ProjectController
 {
     [ApiController]
-    [Route("[controller]")]
+    [Route("api/v1/[controller]")]
     public class ProjectsController : ControllerBase
     {
         private readonly IAddProject _addProjectService;
@@ -126,7 +126,7 @@ namespace TeamManagement.Controllers.ProjectController
             {
                 Project project = await _deleteProject.DeleteProject(projectId);
 
-                return Ok(project);
+                return NoContent();
             }
             catch (Exception ex)
             {

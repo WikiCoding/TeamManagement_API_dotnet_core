@@ -7,7 +7,7 @@ using TeamManagement.ValueObjects;
 namespace TeamManagement.Controllers.EmployeeController
 {
     [ApiController]
-    [Route("[controller]")]
+    [Route("api/v1/[controller]")]
     public class EmployeesController : ControllerBase
     {
         private readonly IGetAllEmployees _getAllEmployeesService;

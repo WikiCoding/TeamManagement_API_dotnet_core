@@ -34,7 +34,7 @@ builder.Services.AddScoped<IAddEmployee, AddEmployeeService>();
 builder.Services.AddScoped<IGetAllEmployees, GetAllEmployeesService>();
 builder.Services.AddScoped<IUpdateEmployee, UpdateEmployeeService>();
 builder.Services.AddScoped<IDeleteEmployee, DeleteEmployeeService>();
-builder.Services.AddDbContext<TeamManagementDbContext>(options => 
+builder.Services.AddDbContext<TeamManagementDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("TeamManagementDb")));
 
 var app = builder.Build();
@@ -49,5 +49,20 @@ if (app.Environment.IsDevelopment())
 app.UseAuthorization();
 
 app.MapControllers();
+
+using (var scope = app.Services.CreateScope())
+{
+    var dbContext = scope.ServiceProvider.GetRequiredService<TeamManagementDbContext>();
+    if (app.Environment.IsDevelopment())
+    {
+        // auto database create-drop
+        dbContext.Database.EnsureDeleted();
+        dbContext.Database.EnsureCreated();
+    }
+    else
+    {
+        dbContext.Database.Migrate();
+    }
+}
 
 app.Run();

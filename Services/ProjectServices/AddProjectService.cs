@@ -32,7 +32,7 @@ namespace TeamManagement.Services.ProjectServices
 
             ProjectDataModel projectDataModel = await _projectRepository.CreateProject(project);
             
-            project.projectId = projectId;
+            project.projectId = new ProjectId(projectDataModel.ProjectId);
 
             return project;
         }
